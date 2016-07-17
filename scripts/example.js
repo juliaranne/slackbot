@@ -1,9 +1,49 @@
-var images = [ "http://images.wikia.com/pt.starwars/images/c/c4/Yoda2.jpg",  "http://images.wikia.com/es.starwars/images/4/45/Yoda.jpg", "http://img.lum.dolimg.com/v1/images/ep3_ia_89377_r_bb46f7c6.jpeg", "http://vignette2.wikia.nocookie.net/starwars/images/1/14/Air_yoda.jpg/revision/latest", "http://screencrush.com/442/files/2014/12/yoda-back.jpg", "http://cdn.pcwallart.com/images/yoda-wallpaper-1920x1080-wallpaper-4.jpg" ];
 
-
+var allItems;
+// var itemNum;
 module.exports = function(robot) {
-  return robot.hear(/^yoda pic$/i, function(msg) {
-    return msg.send(msg.random(images));
-  });
+
+  var addSpace = function(product){
+    return ' '+product;
+  }
+
+  robot.hear(/(?:shopping list|sl)(.*)/i, function(res) {
+    var itemNum = (robot.brain.itemNum) * 1 || 0;
+    var shoppingList = robot.brain.get(allItems);
+
+    var item = res.match[1];
+    item = item.trim();
+    
+    if (item === ''){
+       item = '';
+       return res.send(shoppingList);
+    }
+    
+    if (item === 'empty'){
+
+       robot.brain.set(allItems, '');
+       robot.brain.set(itemNum, 0);
+       return res.send('no items');
+
+    } else {
+
+    item = addSpace(item);
+    robot.brain.set(allItems, shoppingList + item);
+
+       if (itemNum >= 1){
+         item = item + ','
+         return res.send('Please buy' + item + shoppingList);
+         itemNum += 1; 
+       } else {
+         return res.send('Please buy' + item + shoppingList);
+         itemNum += 1;
+       }
+    
+    
+    }
+
+	});
+
+
 };
 
